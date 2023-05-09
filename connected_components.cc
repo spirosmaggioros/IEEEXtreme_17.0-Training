@@ -28,48 +28,85 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define dbg(...)
 #endif
 
-class Graph{
+class graph{
 public:
-    Graph(ll n , ll m) : n(n) , w(m){}
+    graph(int V , int E) : V(V) , E(E) {}
 
-    void addEdge(ll u , ll v){
-        m[u].push_back(v);
-        m[v].push_back(u);
+    void addEdge(int a , int b){
+        adj[a].push_back(b);
+        //adj[b].push_back(a);
     }
-    void dfs(ll &start , vector<bool> &visited){
+
+    void dfs(int start){
+        vector<bool> visited(V , false);
         visited[start] = true;
-        for(auto & x : m[start]){
-            if(!visited[x]){
-                dfs(x , visited);
+        stack<int> s;
+        s.push(start);
+        while(!s.empty()){
+            int current = s.top();
+            visited[current] = true;
+            s.pop();
+            for(auto & x : adj[current]){
+                if(!visited[x]){
+                    s.push(x);
+                }
             }
         }
     }
 
-    ll connected_components(){
-        ll ans = 0;
-        vector<bool> visited(n , false);
-        for(ll i = 0; i<n; i++){
-            if(!visited[i]){
-                dfs(i , visited);
-                ans++;
+    void bfs(int start){
+        vector<bool> visited(V , false);
+        visited[start] = true;
+        queue<int> q;
+        q.push(start);
+        while(!q.empty()){
+            auto current = q.front();
+            visited[current] = true;
+            q.pop();
+            for(auto & x : adj[current]){
+                if(!visited[x]){
+                    q.push(x);
+                }
             }
         }
-        return ans;
+    }
+
+    void dfs_2(vector<bool> &visited , int start){
+        visited[start] = true;
+        for(auto & x : adj[start]){
+            if(!visited[x]){
+                dfs_2(visited , x);
+            }
+        }
+    }
+
+
+    int islands(int start){
+        int counter = 0;
+        vector<bool> visited(V , false);
+        for(int i = 0; i<V; i++){
+            if(!visited[i]) {
+                dfs_2(visited, i);
+                counter++;
+            }
+        }
+        return counter;
     }
 
 private:
-    unordered_map<ll , vector<ll> > m;
-
-    ll n;
-    ll w;
+    unordered_map<int , vector<int> > adj;
+    int V;
+    int E;
 };
 
+
 int main(){
-    ll n , m; cin >> n >> m;
-    Graph g(n  , m);
-    while(m--){
-        ll a , b; cin >> a >> b;
+    int V , E; cin >> V >> E;
+    graph g(V , E);
+    while(E--) {
+        int a, b;
+        cin >> a >> b;
         g.addEdge(a , b);
     }
-    cout << g.connected_components() << '\n';
+    cout << g.islands(0) << '\n';
 }
