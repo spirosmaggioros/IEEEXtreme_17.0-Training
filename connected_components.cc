@@ -93,6 +93,58 @@ public:
         return counter;
     }
 
+    void push_vertex(int start , stack<int> &s , vector<bool> &visited){
+        visited[start] = true;
+        for(auto & x : adj[start]){
+            if(!visited[x]){
+                push_vertex(x , s , visited);
+            }
+        }
+
+        s.push(start);
+    }
+
+    void dfs_with_new(vector<bool> &visited,  int start , unordered_map<int , vector<int> > &adj){
+        visited[start] = true;
+        for(auto & x : adj[start]){
+            if(!visited[x]){
+                dfs_with_new(visited , x , adj);
+            }
+        }
+    }
+
+    int kosaraju(){
+        vector<bool> visited(V , false);
+        stack<int> s;
+        for(int i = 0; i<V; i++){
+            if(!visited[i]){
+                push_vertex(i , s , visited);
+            }
+        }
+        //φτιάχνω τον καινουργιο γράφο
+        unordered_map<int , vector<int> > new_adj;
+        for(int i = 0; i<V; i++){
+            for(auto & x : adj[i]){
+                new_adj[x].push_back(i);
+            }
+        }
+
+        //2ο πέρασμα
+        int scc = 0;
+        for(int i = 0; i<V; i++){
+            visited[i] = false;
+        }
+        while(!s.empty()) {
+            int current = s.top();
+            s.pop();
+            if (!visited[current]) {
+                dfs_with_new(visited, current, new_adj);
+                scc++;
+            }
+        }
+        return scc;
+    }
+
 private:
     unordered_map<int , vector<int> > adj;
     int V;
@@ -108,5 +160,5 @@ int main(){
         cin >> a >> b;
         g.addEdge(a , b);
     }
-    cout << g.islands(0) << '\n';
+    cout << g.kosaraju() << '\n';
 }
