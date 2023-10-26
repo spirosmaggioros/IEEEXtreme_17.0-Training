@@ -93,16 +93,18 @@ typedef long long int int64;
 typedef unsigned long int uint32;
 
 int main(){
-  ll T; cin >> T;
-  while(T--){
-    ll n; cin >> n;
-    vector<double> v(n);
-    for(auto & x : v){
-      cin >> x;
-    }
-    sort(v.begin() , v.end());
-    double Q = v[n - 1];
-    double P = accumulate(v.begin() , v.begin() + n - 1, 0) / double(n - 1);
-    cout << setprecision(6) <<  Q + P << '\n';
+  ll N; cin >> N;
+  vector<int> nums(N);
+  for(int &x : nums){
+    cin >> x;
   }
+  multiset<int>s;
+  int left=0,ans=1;
+  for(int i=0;i<nums.size();i++){
+    s.insert(nums[i]);
+    while(!s.empty() && *s.rbegin()-*s.begin() > limit)
+      s.erase(s.find(nums[left])) ,left++;
+      ans=max(ans,i-left+1);
+  }
+  cout << ans << '\n';
 }
